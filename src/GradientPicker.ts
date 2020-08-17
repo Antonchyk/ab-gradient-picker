@@ -1,28 +1,51 @@
-const gradientPicker = (currentColors) => {
+import {clearNode, dragElement, getAbsoluteOffset, getRelativeOffset} from "./utils";
 
-    const observers = [];
-    let $popup = null;
-    let $gradientScreen = null;
-    let $stopsContainer = null;
-    let $closeButton = null;
-    let $deleteStopButton = null;
-    let $positionInput = null;
-    let $colorInput;
-    let $header;
+export interface IColorItem {
+    color: string;
+    position: number;
+}
+
+export const gradientPicker = (currentColors: IColorItem[]) => {
+
+    const observers: ((data: IColorItem[]) => void)[] = [];
     let isBeingDragged = false;
-    let draggedStop = null;
+    let draggedStop: HTMLElement;
     let activeIndex = 0;
     const STOP_CENTER = getStopItemWidth() / 2;
 
     const gpColorStops = JSON.parse(JSON.stringify(currentColors));
 
-    createPopup();
+    const $popup: HTMLElement = createPopup();
+    const $gradientScreen = $popup.querySelector('.gradient-screen');
+    const $stopsContainer = $popup.querySelector('.stops-container');
+    const $closeButton = $popup.querySelector('.gp-close');
+    const $deleteStopButton = $popup.querySelector('.gp-delete-stop');
+    const $positionInput = $popup.querySelector('#location') as HTMLInputElement;
+    const $colorInput = $popup.querySelector('#color_picker') as HTMLInputElement;
+
+    $closeButton?.addEventListener('click', close, false);
+    $stopsContainer?.addEventListener('dblclick', onColorAdded, false);
+    $stopsContainer?.addEventListener('mousedown', startMoveColorStop, false);
+    $stopsContainer?.addEventListener('mousemove', moveColorStop, false);
+    $stopsContainer?.addEventListener('mouseup', stopMoveColorStop, false);
+    $deleteStopButton?.addEventListener('click', onColorStopRemoved);
+
+
+    document.body.addEventListener('mouseup', () => {
+        isBeingDragged = false;
+    }, true);
+
+
+    $positionInput?.addEventListener('change', onPositionChanged);
+    $colorInput?.addEventListener('change', onColorStopChange);
+    dragElement($popup, '.gp-header');
+    setActive(0);
 
     // region model
-    function addColorStop(position) {
+    function addColorStop(position: number) {
         gpColorStops.push({
             color: '#ffffff',
-            position: getRelativeOffset($stopsContainer, position),
+            position: $stopsContainer ? getRelativeOffset($stopsContainer, position) : 0,
         });
         sortColors();
         triggerChange();
@@ -38,10 +61,10 @@ const gradientPicker = (currentColors) => {
     }
 
     function sortColors() {
-        gpColorStops.sort((a, b) => a.position - b.position);
+        gpColorStops.sort((a: IColorItem, b: IColorItem) => a.position - b.position);
     }
 
-    function changePosition(value, index) {
+    function changePosition(value: number, index: number) {
         if (value > 100 || value < 0) {
             return;
         }
@@ -49,12 +72,12 @@ const gradientPicker = (currentColors) => {
         triggerChange();
     }
 
-    function changeColor(value) {
+    function changeColor(value: string) {
         gpColorStops[activeIndex].color = value;
         triggerChange();
     }
 
-    function onChange(cb) {
+    function onChange(cb: (data: IColorItem[]) => void) {
         observers.push(cb);
     }
 
@@ -64,26 +87,29 @@ const gradientPicker = (currentColors) => {
 
     // endregion
 
-    function setActive(index) {
+    function setActive(index: number) {
         activeIndex = index;
         render();
     }
 
-    function onPositionChanged(e) {
-        changePosition(parseFloat(e.target.value), activeIndex);
+    function onPositionChanged(e: Event) {
+        if (e.target) {
+            changePosition(parseFloat((e.target as HTMLInputElement).value), activeIndex);
+        }
         render();
     }
 
-    function onColorAdded(e) {
-        addColorStop(e.offsetX);
-        const activeStopIndex = gpColorStops.findIndex(i => i.position === getRelativeOffset(e.target, e.offsetX));
+    function onColorAdded(e: Event) {
+        const offsetX = (e as MouseEvent).offsetX;
+        addColorStop(offsetX);
+        const activeStopIndex = gpColorStops.findIndex((i: IColorItem) => i.position === getRelativeOffset((e.target as HTMLElement), offsetX));
         if (activeStopIndex > -1) {
             setActive(activeStopIndex);
         }
     }
 
-    function onColorStopChange(e) {
-        changeColor(e.target.value);
+    function onColorStopChange(e: Event) {
+        changeColor((e.target as HTMLInputElement).value);
         render();
     }
 
@@ -114,49 +140,21 @@ const gradientPicker = (currentColors) => {
                               </div>                        
                           </div>
                            <div id="gp_close" class="gp-close"></div>`;
-        $popup = document.createElement('div');
-        $popup.className = 'gp-container';
-        $popup.innerHTML = template;
-        window.document.body.appendChild($popup);
-        addEventHandlers();
-        setActive(0);
-    }
-
-    function addEventHandlers() {
-        $gradientScreen = $popup.querySelector('.gradient-screen');
-        $stopsContainer = $popup.querySelector('.stops-container');
-        $closeButton = $popup.querySelector('.gp-close');
-        $deleteStopButton = $popup.querySelector('.gp-delete-stop');
-        $positionInput = $popup.querySelector('#location');
-        $colorInput = $popup.querySelector('#color_picker');
-        $header = $popup.querySelector('.gp-header');
-
-
-        $closeButton.addEventListener('click', close, false);
-
-        $stopsContainer.addEventListener('dblclick', onColorAdded, false);
-
-        $stopsContainer.addEventListener('mousedown', startMoveColorStop, false);
-        $stopsContainer.addEventListener('mousemove', moveColorStop, false);
-        $stopsContainer.addEventListener('mouseup', stopMoveColorStop, false);
-
-        $deleteStopButton.addEventListener('click', onColorStopRemoved);
-
-        document.body.addEventListener('mouseup', () => {
-            isBeingDragged = false;
-        }, true);
-
-        $positionInput.addEventListener('change', onPositionChanged);
-        $colorInput.addEventListener('change', onColorStopChange);
-        dragElement($popup, '.gp-header');
+        const p = document.createElement('div');
+        p.className = 'gp-container';
+        p.innerHTML = template;
+        window.document.body.appendChild(p);
+        return p;
     }
 
     function close() {
         window.document.body.removeChild($popup);
-        $popup = null;
     }
 
     function renderGradients() {
+        if (!$gradientScreen) {
+            return;
+        }
         let value;
         if (gpColorStops.length === 1) {
             value = `${gpColorStops[0].color}`
@@ -167,21 +165,24 @@ const gradientPicker = (currentColors) => {
             }
             value += `)`;
         }
-        $gradientScreen.style.background = value;
+        ($gradientScreen as HTMLDivElement).style.background = value;
     }
 
     function renderStops() {
         if (isBeingDragged) {
             return;
         }
+        if (!$stopsContainer) {
+            return;
+        }
         if ($stopsContainer.children.length !== gpColorStops.length) {
             clearNode($stopsContainer);
             for (let i = 0; i < gpColorStops.length; i++) {
-                $stopsContainer.appendChild(createStop(gpColorStops[i], i));
+                $stopsContainer.appendChild(createStop(gpColorStops[i], i) as Node);
             }
         } else {
             for (let i = 0; i < $stopsContainer.children.length; i++) {
-                const el = $stopsContainer.children[i];
+                const el = $stopsContainer.children[i] as HTMLElement;
                 el.classList.remove('active');
                 el.style.background = gpColorStops[i].color;
                 el.style.transform = `translate3d(${getAbsoluteOffset($stopsContainer, gpColorStops[i].position) - STOP_CENTER}px, 0, 0)`;
@@ -191,7 +192,10 @@ const gradientPicker = (currentColors) => {
     }
 
     function renderLocationInput() {
-        $positionInput.value = gpColorStops[activeIndex].position;
+        if (!$positionInput) {
+            return;
+        }
+        ($positionInput as HTMLInputElement).value = gpColorStops[activeIndex].position;
     }
 
     function renderColorInput() {
@@ -205,10 +209,13 @@ const gradientPicker = (currentColors) => {
         renderColorInput();
     }
 
-    function createStop(item, index) {
-        const elem = document.createElement('div');
+    function createStop(item: IColorItem, index: number) {
+        if (!$stopsContainer) {
+            return;
+        }
+        const elem = document.createElement('div') as HTMLDivElement;
         elem.className = `stop-item ${index === activeIndex ? `active` : ``}`;
-        elem.dataset.index = index;
+        elem.dataset.index = index.toString();
         elem.style.background = item.color;
         elem.style.transform = `translate3d(${getAbsoluteOffset($stopsContainer, item.position) - STOP_CENTER}px, 0, 0)`;
         elem.addEventListener('mousedown', () => {
@@ -228,15 +235,18 @@ const gradientPicker = (currentColors) => {
         return elem;
     }
 
-    // region stop move
-    let stopsContainerRect = null;
+    // region color-stop move
+    let stopsContainerRect: DOMRect;
 
-    function moveColorStop(e) {
+    function moveColorStop(e: Event) {
         if (!isBeingDragged) {
             return;
         }
+        if (!$stopsContainer) {
+            return;
+        }
         e.preventDefault();
-        const x = e.clientX - stopsContainerRect.left;
+        const x = (e as MouseEvent).clientX - stopsContainerRect.left;
         if (stopsContainerRect.width <= x) {
             return;
         }
@@ -244,12 +254,18 @@ const gradientPicker = (currentColors) => {
             return;
         }
         draggedStop.style.transform = `translate3d(${x - STOP_CENTER}px, 0, 0)`;
-        changePosition(getRelativeOffset($stopsContainer, x), parseInt(draggedStop.dataset.index));
+        changePosition(
+            getRelativeOffset($stopsContainer, x),
+            draggedStop.dataset.index ? parseInt(draggedStop.dataset.index) : 0
+        );
         renderGradients();
         renderLocationInput();
     }
 
-    function startMoveColorStop(e) {
+    function startMoveColorStop(e: Event) {
+        if (!$stopsContainer) {
+            return;
+        }
         if (e.target === draggedStop) {
             isBeingDragged = true;
         }
@@ -258,65 +274,6 @@ const gradientPicker = (currentColors) => {
 
     function stopMoveColorStop() {
         isBeingDragged = false;
-    }
-
-    // endregion
-
-    // region utils
-    function getAbsoluteOffset(domElem, relativeOffset) {
-        return domElem.offsetWidth * (relativeOffset / 100);
-    }
-
-    function getRelativeOffset(domElem, absoluteOffset) {
-        return parseFloat(((absoluteOffset / domElem.offsetWidth) * 100).toFixed(2));
-    }
-
-    function clearNode(node) {
-        node.querySelectorAll('*').forEach(n => n.remove());
-    }
-
-    // endregion
-
-    // region popup move
-
-    function dragElement(domElement, dragZoneElemSelector) {
-        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-        const dragPoint = domElement.querySelector(dragZoneElemSelector)
-        if (dragPoint) {
-            dragPoint.onmousedown = dragMouseDown;
-        } else {
-            domElement.onmousedown = dragMouseDown;
-        }
-
-        function dragMouseDown(e) {
-            e = e || window.event;
-            e.preventDefault();
-            // get the mouse cursor position at startup:
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
-            // call a function whenever the cursor moves:
-            document.onmousemove = elementDrag;
-        }
-
-        function elementDrag(e) {
-            e = e || window.event;
-            e.preventDefault();
-            // calculate the new cursor position:
-            pos1 = pos3 - e.clientX;
-            pos2 = pos4 - e.clientY;
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            // set the element's new position:
-            domElement.style.top = (domElement.offsetTop - pos2) + "px";
-            domElement.style.left = (domElement.offsetLeft - pos1) + "px";
-        }
-
-        function closeDragElement() {
-            // stop moving when mouse button is released:
-            document.onmouseup = null;
-            document.onmousemove = null;
-        }
     }
 
     // endregion

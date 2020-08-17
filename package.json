@@ -5,15 +5,24 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
-    "test": "test"
+    "test": "demo"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \\\"Error: no demo specified\\\" && exit 1",
+    "prepublish": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Antonchyk/ab-gradient-picker.git"
   },
   "keywords": [
     "gradient",
     "picker"
   ],
   "author": "antonchyk",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "tslint": "^6.1.3",
+    "typescript": "^3.9.7"
+  }
 }

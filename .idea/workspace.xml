@@ -13,6 +13,7 @@
         <option value="HTML File" />
         <option value="CSS File" />
         <option value="JavaScript File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -38,6 +39,23 @@
       <recent name="$PROJECT_DIR$/test" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration name="prepublish" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="prepublish" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.prepublish" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -49,14 +67,38 @@
       <workItem from="1597051916573" duration="38420000" />
       <workItem from="1597178801667" duration="96000" />
       <workItem from="1597179391157" duration="20877000" />
-      <workItem from="1597656926334" duration="3225000" />
+      <workItem from="1597656926334" duration="8177000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/src/GradientPicker.d.ts" />
+        <option value="$PROJECT_DIR$/src/GradientPicker.js" />
+        <option value="$PROJECT_DIR$/src/utils.js" />
+        <option value="$PROJECT_DIR$/src/utils.d.ts" />
+      </list>
+    </option>
   </component>
   <component name="WindowStateProjectService">
+    <state width="1419" height="201" key="GridCell.Tab.0.bottom" timestamp="1597666536111">
+      <screen x="0" y="23" width="1440" height="788" />
+    </state>
+    <state width="1419" height="201" key="GridCell.Tab.0.bottom/0.23.1440.788@0.23.1440.788" timestamp="1597666536111" />
+    <state width="1419" height="201" key="GridCell.Tab.0.center" timestamp="1597666536110">
+      <screen x="0" y="23" width="1440" height="788" />
+    </state>
+    <state width="1419" height="201" key="GridCell.Tab.0.center/0.23.1440.788@0.23.1440.788" timestamp="1597666536110" />
+    <state width="1419" height="201" key="GridCell.Tab.0.left" timestamp="1597666536110">
+      <screen x="0" y="23" width="1440" height="788" />
+    </state>
+    <state width="1419" height="201" key="GridCell.Tab.0.left/0.23.1440.788@0.23.1440.788" timestamp="1597666536110" />
+    <state width="1419" height="201" key="GridCell.Tab.0.right" timestamp="1597666536111">
+      <screen x="0" y="23" width="1440" height="788" />
+    </state>
+    <state width="1419" height="201" key="GridCell.Tab.0.right/0.23.1440.788@0.23.1440.788" timestamp="1597666536111" />
     <state x="385" y="188" key="run.anything.popup" timestamp="1597054913217">
       <screen x="0" y="23" width="1440" height="787" />
     </state>

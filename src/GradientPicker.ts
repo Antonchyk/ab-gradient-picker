@@ -12,14 +12,15 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
     let draggedStop: HTMLElement;
     let activeIndex = 0;
     const STOP_CENTER = getStopItemWidth() / 2;
+    const gpPrefix = 'ab-gp-';
 
     const gpColorStops = JSON.parse(JSON.stringify(currentColors));
 
     const $popup: HTMLElement = createPopup();
-    const $gradientScreen = $popup.querySelector('.gradient-screen');
-    const $stopsContainer = $popup.querySelector('.stops-container');
-    const $closeButton = $popup.querySelector('.gp-close');
-    const $deleteStopButton = $popup.querySelector('.gp-delete-stop');
+    const $gradientScreen = $popup.querySelector(`.${gpPrefix}gradient-screen`);
+    const $stopsContainer = $popup.querySelector(`.${gpPrefix}stops-container`);
+    const $closeButton = $popup.querySelector(`.${gpPrefix}close`);
+    const $deleteStopButton = $popup.querySelector(`${gpPrefix}delete-stop`);
     const $positionInput = $popup.querySelector('#location') as HTMLInputElement;
     const $colorInput = $popup.querySelector('#color_picker') as HTMLInputElement;
 
@@ -29,15 +30,12 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
     $stopsContainer?.addEventListener('mousemove', moveColorStop, false);
     $stopsContainer?.addEventListener('mouseup', stopMoveColorStop, false);
     $deleteStopButton?.addEventListener('click', onColorStopRemoved);
-
-
+    $positionInput?.addEventListener('change', onPositionChanged);
+    $colorInput?.addEventListener('change', onColorStopChange);
     document.body.addEventListener('mouseup', () => {
         isBeingDragged = false;
     }, true);
 
-
-    $positionInput?.addEventListener('change', onPositionChanged);
-    $colorInput?.addEventListener('change', onColorStopChange);
     dragElement($popup, '.gp-header');
     setActive(0);
 
@@ -119,13 +117,13 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
     }
 
     function createPopup() {
-        const template = `<div class="gp-header">Gradient Picker</div>
-                          <div class="gp-wrapper">
-                              <div class="gradient-screen"></div>
-                              <div class="stops-container"></div>
-                              <div class="gp-stop-info">
-                                <span class="gp-stops-title">Stops</span>
-                                <div class="input-item">
+        const template = `<div class="ab-gp-header">Gradient Picker</div>
+                          <div class="ab-gp-wrapper">
+                              <div class="ab-gp-gradient-screen"></div>
+                              <div class="ab-gp-stops-container"></div>
+                              <div class="ab-gp-stop-info">
+                                <span class="ab-gp-stops-title">Stops</span>
+                                <div class="ab-gp-input-item">
                                     <label for="color_picker">Color:</label>
                                     <input type="color" id="color_picker" class="gp-color-input">
                                 </div>

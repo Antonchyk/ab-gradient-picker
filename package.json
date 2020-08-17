@@ -1,0 +1,19 @@
+{
+  "name": "ab-gradient-picker",
+  "version": "1.0.0",
+  "description": "Simple gradient picker",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gradient",
+    "picker"
+  ],
+  "author": "antonchyk",
+  "license": "ISC"
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../GradiantPicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="../gradient-picker.css">
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+<button type="button" id="gp">Color picker</button>
+<div id="info"></div>
+<script>
+    (() => {
+        const colors = [
+            {
+                color: '#ff0000',
+                position: 0,
+            },
+            {
+                color: '#424fff',
+                position: 50,
+            },
+            {
+                color: '#5cff72',
+                position: 100,
+            }
+        ]
+        document.getElementById('gp').addEventListener('click', () => {
+            const gp = gradientPicker(colors);
+            gp.onChange((colorsData) => {
+                console.log(colorsData);
+            });
+        });
+    })()
+</script>
+</body>
+</html>

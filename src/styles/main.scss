@@ -1,65 +1,63 @@
-.gp-container * {
+.ab-gp-container {
+  width: 600px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #525253;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff;
+  font-size: 14px;
+
+  * {
     outline: none;
-}
+  }
 
-
-.gp-container {
-    width: 600px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #525253;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #fff;
-    font-size: 14px;
-}
-
-.gp-wrapper {
+  .ab-gp-wrapper {
     padding: 10px;
-}
+  }
 
-.gp-close {
+  .ab-gp-close {
     position: absolute;
     right: 6px;
     top: 6px;
     width: 16px;
     height: 16px;
     cursor: pointer;
-}
 
-.gp-close:before, .gp-close:after {
-    position: absolute;
-    left: 8px;
-    content: ' ';
-    height: 16px;
-    width: 1px;
-    background-color: #fff;
-}
+    &:before, &:after {
+      position: absolute;
+      left: 8px;
+      content: ' ';
+      height: 16px;
+      width: 1px;
+      background-color: #fff;
+    }
 
-.gp-close:before {
-    transform: rotate(45deg);
-}
+    &:before {
+      transform: rotate(45deg);
+    }
 
-.gp-close:after {
-    transform: rotate(-45deg);
-}
+    &:after {
+      transform: rotate(-45deg);
+    }
+  }
 
 
-.gradient-screen {
+  .ab-gp-screen {
     margin: 5px auto 0;
     height: 50px;
     background: indianred;
-}
+  }
 
-.stops-container {
+  .ab-gp-stops-container {
     margin: 0 auto;
     height: 40px;
     cursor: pointer;
     position: relative;
-}
+  }
 
-.stop-item {
+  .ab-gp-stop-item {
     width: 10px;
     height: 10px;
     position: absolute;
@@ -67,34 +65,34 @@
     background: white;
     cursor: grab;
     border: 1px solid #fff;
-}
 
-.stop-item:before {
-    content: '';
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-bottom: 7px solid gray;
-    top: -9px;
-    position: absolute;
-    left: -2px;
-}
+    &:before {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-bottom: 7px solid gray;
+      top: -9px;
+      position: absolute;
+      left: -2px;
+    }
 
-.stop-item.active:before {
-    border-bottom-color: black;
-}
+    &.active:before {
+      border-bottom-color: black;
+    }
+  }
 
-.gp-header {
+  .ab-gp-header {
     height: 28px;
     cursor: move;
     background: #454545;
     border-bottom: #171717 1px solid;
     line-height: 28px;
     padding: 0 20px 0 10px;
-}
+  }
 
-.gp-stop-info {
+  .ab-gp-stop-info {
     margin: 5px auto 20px;
     display: flex;
     flex-grow: 1;
@@ -103,40 +101,39 @@
     border-radius: 1px;
     position: relative;
     justify-content: space-around;
-}
+  }
 
-.gp-stops-title {
+  .ab-gp-stops-title {
     position: absolute;
     left: 10px;
     top: -10px;
     padding: 0 4px;
     background: #525253;
-}
+  }
 
-.gp-color-input {
+  .ab-gp-color-input {
     background: none;
     padding: 0;
     height: 28px;
     margin: 0 0 -4px 4px;
-    /*border: 1px solid #3C3C3C;*/
     border-radius: 0;
-}
+  }
 
-.input-item {
+  .ab-gp-input-item {
     position: relative;
     flex-grow: 2;
     text-align: center;
     display: flex;
     align-items: flex-end;
-}
+  }
 
-.input-item:nth-child(3), .input-item:nth-child(4) {
+  .ab-gp-input-item:nth-child(3), .ab-gp-input-item:nth-child(4) {
     flex-grow: 1;
     text-align: right;
     justify-content: flex-end;
-}
+  }
 
-.gp-location-input {
+  .ab-gp-location-input {
     background: #454545;
     border: 1px solid #666666;
     border-radius: 0;
@@ -144,9 +141,9 @@
     height: 20px;
     color: white;
     font-size: 14px;
-}
+  }
 
-.gp-delete-stop {
+  .ab-gp-delete-stop {
     height: 32px;
     border: 1px solid #666666;
     border-radius: 3px;
@@ -156,4 +153,6 @@
     margin-bottom: -4px;
     font-size: 14px;
     cursor: pointer;
+  }
+
 }

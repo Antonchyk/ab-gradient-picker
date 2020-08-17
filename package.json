@@ -2,14 +2,15 @@
   "name": "ab-gradient-picker",
   "version": "1.0.0",
   "description": "Simple gradient picker",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/GradientPicker.js",
+  "types": "dist/GradientPicker.d.ts",
   "directories": {
     "test": "demo"
   },
   "scripts": {
     "test": "echo \\\"Error: no demo specified\\\" && exit 1",
-    "prepublish": "tsc"
+    "build": "tsc",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",

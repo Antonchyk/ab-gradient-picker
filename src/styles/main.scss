@@ -48,10 +48,10 @@ $gp-pfx: 'ab-gp-' !default;
   }
 
 
-  &screen {
+  &gradient-screen {
     margin: 5px auto 0;
     height: 50px;
-    background: indianred;
+    background: white;
   }
 
   &stops-container {

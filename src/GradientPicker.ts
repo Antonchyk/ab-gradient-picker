@@ -1,4 +1,5 @@
 import {clearNode, dragElement, getAbsoluteOffset, getRelativeOffset} from "./utils";
+import './styles/main.scss';
 
 export interface IColorItem {
     color: string;
@@ -11,8 +12,8 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
     let isBeingDragged = false;
     let draggedStop: HTMLElement;
     let activeIndex = 0;
-    const STOP_CENTER = getStopItemWidth() / 2;
     const gpPrefix = 'ab-gp-';
+    const STOP_CENTER = getStopItemWidth(gpPrefix) / 2;
 
     const gpColorStops = JSON.parse(JSON.stringify(currentColors));
 
@@ -20,7 +21,7 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
     const $gradientScreen = $popup.querySelector(`.${gpPrefix}gradient-screen`);
     const $stopsContainer = $popup.querySelector(`.${gpPrefix}stops-container`);
     const $closeButton = $popup.querySelector(`.${gpPrefix}close`);
-    const $deleteStopButton = $popup.querySelector(`${gpPrefix}delete-stop`);
+    const $deleteStopButton = $popup.querySelector(`.${gpPrefix}delete-stop`);
     const $positionInput = $popup.querySelector('#location') as HTMLInputElement;
     const $colorInput = $popup.querySelector('#color_picker') as HTMLInputElement;
 
@@ -36,7 +37,7 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
         isBeingDragged = false;
     }, true);
 
-    dragElement($popup, '.gp-header');
+    dragElement($popup, `.${gpPrefix}header`);
     setActive(0);
 
     // region model
@@ -125,21 +126,21 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
                                 <span class="ab-gp-stops-title">Stops</span>
                                 <div class="ab-gp-input-item">
                                     <label for="color_picker">Color:</label>
-                                    <input type="color" id="color_picker" class="gp-color-input">
+                                    <input type="color" id="color_picker" class="ab-gp-color-input">
                                 </div>
-                                <div class="input-item">
+                                <div class="ab-gp-input-item">
                                     <label for="location">Location:</label>
-                                    <input type="number" id="location" min="0" max="100" class="gp-location-input">
+                                    <input type="number" id="location" min="0" max="100" class="ab-gp-location-input">
                                     <span>%</span>
                                 </div>
-                                <div class="input-item">
-                                    <button type="button" class="gp-delete-stop">Delete</button>
+                                <div class="ab-gp-input-item">
+                                    <button type="button" class="ab-gp-delete-stop">Delete</button>
                                 </div>
                               </div>                        
                           </div>
-                           <div id="gp_close" class="gp-close"></div>`;
+                           <div id="gp_close" class="ab-gp-close"></div>`;
         const p = document.createElement('div');
-        p.className = 'gp-container';
+        p.className = 'ab-gp-container';
         p.innerHTML = template;
         window.document.body.appendChild(p);
         return p;
@@ -212,7 +213,7 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
             return;
         }
         const elem = document.createElement('div') as HTMLDivElement;
-        elem.className = `stop-item ${index === activeIndex ? `active` : ``}`;
+        elem.className = `${gpPrefix}stop-item ${index === activeIndex ? `active` : ``}`;
         elem.dataset.index = index.toString();
         elem.style.background = item.color;
         elem.style.transform = `translate3d(${getAbsoluteOffset($stopsContainer, item.position) - STOP_CENTER}px, 0, 0)`;
@@ -276,9 +277,9 @@ export const gradientPicker = (currentColors: IColorItem[]) => {
 
     // endregion
 
-    function getStopItemWidth() {
+    function getStopItemWidth(prefix: string) {
         const el = document.createElement('div');
-        el.className = 'stop-item';
+        el.className = `${prefix}stop-item`;
         document.body.appendChild(el);
         const css = el.getBoundingClientRect();
         document.body.removeChild(el);

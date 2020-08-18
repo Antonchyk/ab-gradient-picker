@@ -1,6 +1,6 @@
 {
   "name": "ab-gradient-picker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple gradient picker",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

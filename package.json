@@ -2,7 +2,7 @@
   "name": "ab-gradient-picker",
   "version": "1.0.0",
   "description": "Simple gradient picker",
-  "main": "dist/GradientPicker.js",
+  "main": "dist/main.js",
   "types": "dist/GradientPicker.d.ts",
   "directories": {
     "test": "demo"

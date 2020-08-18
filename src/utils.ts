@@ -49,3 +49,57 @@ export function getRelativeOffset(domElem: Element, absoluteOffset: number) {
 export function clearNode(node: Element) {
     node.querySelectorAll('*').forEach(n => n.remove());
 }
+
+export function makeResizableDiv(domElement: HTMLElement, onResizeCb?: () => void) {
+    const resizerElem = document.createElement('div');
+    resizerElem.style.width = '10px';
+    resizerElem.style.height = '100%';
+    resizerElem.style.position = 'absolute';
+    resizerElem.style.top = '0';
+    resizerElem.style.right = '-10px';
+    resizerElem.style.cursor = 'ew-resize';
+    resizerElem.addEventListener('mousedown', (e) => {
+        e.preventDefault()
+        window.addEventListener('mousemove', resize)
+        window.addEventListener('mouseup', stopResize)
+    });
+    domElement.appendChild(resizerElem);
+
+    function resize(e: MouseEvent) {
+        domElement.style.width = e.pageX - domElement.getBoundingClientRect().left + 'px';
+        if (onResizeCb) {
+            onResizeCb();
+        }
+    }
+
+    function stopResize() {
+        window.removeEventListener('mousemove', resize)
+    }
+
+    // const element = document.querySelector(selector);
+    // const resizers = document.querySelectorAll(div + ' .resizer')
+    // for (let i = 0;i < resizers.length; i++) {
+    //     const currentResizer = resizers[i];
+    //     currentResizer.addEventListener('mousedown', function(e) {
+    //         e.preventDefault()
+    //         window.addEventListener('mousemove', resize)
+    //         window.addEventListener('mouseup', stopResize)
+    //     })
+    //
+    //     function resize(e) {
+    //         if (currentResizer.classList.contains('bottom-right')) {
+    //             element.style.width = e.pageX - element.getBoundingClientRect().left + 'px'
+    //         }
+    //     }
+    //
+    //     function stopResize() {
+    //         window.removeEventListener('mousemove', resize)
+    //     }
+    // }
+}
+
+export function centerElem(domElem: HTMLElement) {
+    const rect = domElem.getBoundingClientRect();
+    domElem.style.left = (window.innerWidth / 2) - (rect.width / 2) + 'px';
+    domElem.style.top = (window.innerHeight / 2) - (rect.height / 2) + 'px';
+}

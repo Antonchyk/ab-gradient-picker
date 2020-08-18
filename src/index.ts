@@ -1,4 +1,4 @@
-import {clearNode, dragElement, getAbsoluteOffset, getRelativeOffset} from "./utils";
+import {centerElem, clearNode, dragElement, getAbsoluteOffset, getRelativeOffset, makeResizableDiv} from "./utils";
 import './styles/main.scss';
 
 export interface IColorItem {
@@ -54,6 +54,7 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
     const $positionInput = $popup.querySelector('#location') as HTMLInputElement;
     const $colorInput = $popup.querySelector('#color_picker') as HTMLInputElement;
 
+    $popup.addEventListener('resize', renderStops, false);
     $closeButton?.addEventListener('click', close, false);
     $stopsContainer?.addEventListener('dblclick', onColorAdded, false);
     $stopsContainer?.addEventListener('mousedown', startMoveColorStop, false);
@@ -65,8 +66,10 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
     document.body.addEventListener('mouseup', () => {
         isBeingDragged = false;
     }, true);
-
+    document.body.appendChild($popup);
+    centerElem($popup);
     dragElement($popup, `.${gpPrefix}header`);
+    makeResizableDiv($popup, renderStops);
     setActive(0);
 
     // region model
@@ -172,7 +175,6 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
         p.className = 'ab-gp-container';
         p.innerHTML = template;
         p.style.zIndex = zIndex ? zIndex.toString() : '';
-        window.document.body.appendChild(p);
         return p;
     }
 

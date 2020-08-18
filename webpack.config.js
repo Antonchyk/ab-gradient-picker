@@ -1,10 +1,13 @@
 const path = require('path');
 
 module.exports = {
-    entry: path.join(__dirname, 'src/index.ts'),
+    entry: './src/index.ts',
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'index.js'
+        path: path.join(path.resolve(__dirname), 'dist'),
+        filename: 'index.js',
+        libraryTarget: 'umd',
+        library: 'ab-gradient-picker',
+        umdNamedDefine: true
     },
     devtool: 'inline-source-map',
     module: {

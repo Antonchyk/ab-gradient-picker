@@ -10,8 +10,33 @@ export interface IGradientPicker {
     onChange: (cb: (data: IColorItem[]) => void) => void;
 }
 
-export function createGradientPicker(currentColors: IColorItem[]): IGradientPicker {
+export interface IGradientPickerConfig {
+    initColors?: IColorItem[];
+    zIndex?: number;
+}
 
+const DEFAULT_CONFIG: IGradientPickerConfig = {
+    initColors: [
+        {
+            color: '#ffffff',
+            position: 0,
+        },
+        {
+            color: '#000000',
+            position: 100,
+        }
+    ],
+    zIndex: 999
+}
+
+export function createGradientPicker(config?: IGradientPickerConfig): IGradientPicker {
+
+    // region config
+    let gpConfig: IGradientPickerConfig = Object.assign({}, DEFAULT_CONFIG);
+    if (config) {
+        gpConfig = Object.assign(DEFAULT_CONFIG, config);
+    }
+    // endregion
     const observers: ((data: IColorItem[]) => void)[] = [];
     let isBeingDragged = false;
     let draggedStop: HTMLElement;
@@ -19,9 +44,9 @@ export function createGradientPicker(currentColors: IColorItem[]): IGradientPick
     const gpPrefix = 'ab-gp-';
     const STOP_CENTER = getStopItemWidth(gpPrefix) / 2;
 
-    const gpColorStops = JSON.parse(JSON.stringify(currentColors));
+    const gpColorStops = JSON.parse(JSON.stringify(gpConfig.initColors));
 
-    const $popup: HTMLElement = createPopup();
+    const $popup = createPopup(gpConfig.zIndex);
     const $gradientScreen = $popup.querySelector(`.${gpPrefix}gradient-screen`);
     const $stopsContainer = $popup.querySelector(`.${gpPrefix}stops-container`);
     const $closeButton = $popup.querySelector(`.${gpPrefix}close`);
@@ -80,15 +105,15 @@ export function createGradientPicker(currentColors: IColorItem[]): IGradientPick
         triggerChange();
     }
 
-    function onChange(cb: (data: IColorItem[]) => void) {
-        observers.push(cb);
-    }
+    // endregion
 
     function triggerChange() {
         observers.map(cb => cb(gpColorStops));
     }
 
-    // endregion
+    function onChange(cb: (data: IColorItem[]) => void) {
+        observers.push(cb);
+    }
 
     function setActive(index: number) {
         activeIndex = index;
@@ -121,7 +146,7 @@ export function createGradientPicker(currentColors: IColorItem[]): IGradientPick
         setActive(0);
     }
 
-    function createPopup() {
+    function createPopup(zIndex?: number) {
         const template = `<div class="ab-gp-header">Gradient Picker</div>
                           <div class="ab-gp-wrapper">
                               <div class="ab-gp-gradient-screen"></div>
@@ -142,10 +167,11 @@ export function createGradientPicker(currentColors: IColorItem[]): IGradientPick
                                 </div>
                               </div>                        
                           </div>
-                           <div id="gp_close" class="ab-gp-close"></div>`;
+                          <div id="gp_close" class="ab-gp-close"></div>`;
         const p = document.createElement('div');
         p.className = 'ab-gp-container';
         p.innerHTML = template;
+        p.style.zIndex = zIndex ? zIndex.toString() : '';
         window.document.body.appendChild(p);
         return p;
     }

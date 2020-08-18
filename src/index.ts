@@ -6,7 +6,11 @@ export interface IColorItem {
     position: number;
 }
 
-export const index = (currentColors: IColorItem[]) => {
+export interface IGradientPicker {
+    onChange: (cb: (data: IColorItem[]) => void) => void;
+}
+
+export function createGradientPicker(currentColors: IColorItem[]): IGradientPicker {
 
     const observers: ((data: IColorItem[]) => void)[] = [];
     let isBeingDragged = false;

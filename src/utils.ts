@@ -51,51 +51,60 @@ export function clearNode(node: Element) {
 }
 
 export function makeResizableDiv(domElement: HTMLElement, onResizeCb?: () => void) {
-    const resizerElem = document.createElement('div');
-    resizerElem.style.width = '10px';
-    resizerElem.style.height = '100%';
-    resizerElem.style.position = 'absolute';
-    resizerElem.style.top = '0';
-    resizerElem.style.right = '-10px';
-    resizerElem.style.cursor = 'ew-resize';
-    resizerElem.addEventListener('mousedown', (e) => {
+    const resizerElemRight = document.createElement('div');
+    resizerElemRight.style.width = '2px';
+    resizerElemRight.style.height = '100%';
+    resizerElemRight.style.position = 'absolute';
+    resizerElemRight.style.top = '0';
+    resizerElemRight.style.right = '0';
+    resizerElemRight.style.cursor = 'ew-resize';
+    domElement.appendChild(resizerElemRight);
+
+    const resizerElemLeft = document.createElement('div');
+    resizerElemLeft.style.width = '2px';
+    resizerElemLeft.style.height = '100%';
+    resizerElemLeft.style.position = 'absolute';
+    resizerElemLeft.style.top = '0';
+    resizerElemLeft.style.left = '0';
+    resizerElemLeft.style.cursor = 'ew-resize';
+    domElement.appendChild(resizerElemLeft);
+
+    let initWidth = 0;
+    let initLeft = 0;
+
+    resizerElemRight.addEventListener('mousedown', function (e) {
         e.preventDefault()
-        window.addEventListener('mousemove', resize)
+        window.addEventListener('mousemove', resizeRight)
         window.addEventListener('mouseup', stopResize)
     });
-    domElement.appendChild(resizerElem);
 
-    function resize(e: MouseEvent) {
+    resizerElemLeft.addEventListener('mousedown', function (e) {
+        initWidth = domElement.getBoundingClientRect().width;
+        initLeft = e.pageX;
+        e.preventDefault()
+        window.addEventListener('mousemove', resizeLeft)
+        window.addEventListener('mouseup', stopResize)
+    });
+
+    function resizeRight(e: MouseEvent) {
         domElement.style.width = e.pageX - domElement.getBoundingClientRect().left + 'px';
         if (onResizeCb) {
             onResizeCb();
         }
     }
 
-    function stopResize() {
-        window.removeEventListener('mousemove', resize)
+    function resizeLeft(e: MouseEvent) {
+        domElement.style.left = e.pageX + 'px';
+        domElement.style.width = initWidth + (initLeft - e.pageX)  + 'px';
+        if (onResizeCb) {
+            onResizeCb();
+        }
     }
 
-    // const element = document.querySelector(selector);
-    // const resizers = document.querySelectorAll(div + ' .resizer')
-    // for (let i = 0;i < resizers.length; i++) {
-    //     const currentResizer = resizers[i];
-    //     currentResizer.addEventListener('mousedown', function(e) {
-    //         e.preventDefault()
-    //         window.addEventListener('mousemove', resize)
-    //         window.addEventListener('mouseup', stopResize)
-    //     })
-    //
-    //     function resize(e) {
-    //         if (currentResizer.classList.contains('bottom-right')) {
-    //             element.style.width = e.pageX - element.getBoundingClientRect().left + 'px'
-    //         }
-    //     }
-    //
-    //     function stopResize() {
-    //         window.removeEventListener('mousemove', resize)
-    //     }
-    // }
+    function stopResize() {
+        window.removeEventListener('mousemove', resizeRight);
+        window.removeEventListener('mousemove', resizeLeft);
+    }
 }
 
 export function centerElem(domElem: HTMLElement) {

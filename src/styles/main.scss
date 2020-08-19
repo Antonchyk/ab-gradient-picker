@@ -3,7 +3,7 @@ $gp-pfx: 'ab-gp-' !default;
 .#{$gp-pfx} {
   &container {
     width: 600px;
-    min-width: 350px;
+    //min-width: 350px;
     position: absolute;
     //top: 50%;
     //left: 50%;
@@ -116,12 +116,14 @@ $gp-pfx: 'ab-gp-' !default;
     background: #525253;
   }
 
-  &color-input {
+  &color-input, &color-div-input {
     background: none;
     padding: 0;
     height: 28px;
     margin: 0 0 -4px 4px;
     border-radius: 0;
+    width: 50px;
+    position: relative;
   }
 
   &input-item {

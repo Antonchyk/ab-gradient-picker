@@ -15,7 +15,7 @@ export interface IColorItem {
 }
 
 export interface IGradientPicker {
-    onChange: (cb: (data: IColorItem[]) => void) => void;
+    on: (key: string, cb: (data: IColorItem[]) => void) => void;
 
     setActiveColor(color: string): void;
 
@@ -43,6 +43,13 @@ const DEFAULT_CONFIG: IGradientPickerConfig = {
     ],
     zIndex: 999,
     isCustomColorPicker: false,
+}
+
+// todo split events
+const EVENTS = {
+    DRAG_START: 'drag:start',
+    DRAG_END: 'drag:end',
+    CHANGE: 'change'
 }
 
 export function createGradientPicker(config?: IGradientPickerConfig): IGradientPicker {
@@ -98,7 +105,6 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
             position: $stopsContainer ? getRelativeOffset($stopsContainer, position) : 0,
         });
         sortColors();
-        triggerChange();
     }
 
     function removeColorStop() {
@@ -107,7 +113,6 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
         }
         gpColorStops.splice(activeIndex, 1);
         sortColors();
-        triggerChange();
     }
 
     function sortColors() {
@@ -119,26 +124,32 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
             return;
         }
         gpColorStops[index].position = value;
-        triggerChange();
+        // trigger(EVENTS.CHANGE);
     }
 
     function changeColor(value: string) {
         gpColorStops[activeIndex].color = value;
-        triggerChange();
+        // trigger(EVENTS.CHANGE);
     }
 
     // endregion
 
     // region observers
-    const observers: ((data: IColorItem[]) => void)[] = [];
+    const observers: Map<string, ((data: IColorItem[]) => void)[]> = new Map<string, ((data: IColorItem[]) => void)[]>();
 
-    function triggerChange() {
-        observers.map(cb => cb(gpColorStops));
+    function trigger(key: string) {
+        if (observers.has(key)) {
+            observers.get(key)?.map(cb => cb(gpColorStops));
+        }
     }
 
-    function onChange(cb: (data: IColorItem[]) => void) {
-        observers.push(cb);
+    function on(key: string, cb: (data: IColorItem[]) => void) {
+        if (!observers.has(key)) {
+            observers.set(key, []);
+        }
+        observers.get(key)?.push(cb);
     }
+
     // endregion
 
     function setActive(index: number) {
@@ -147,15 +158,15 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
     }
 
     function onPositionChanged(e: Event) {
-        if (e.target) {
-            changePosition(parseFloat((e.target as HTMLInputElement).value), activeIndex);
-        }
+        changePosition(parseFloat((e.target as HTMLInputElement).value), activeIndex);
+        trigger(EVENTS.CHANGE);
         render();
     }
 
     function onColorAdded(e: Event) {
         const offsetX = (e as MouseEvent).offsetX;
         addColorStop(offsetX);
+        trigger(EVENTS.CHANGE);
         const activeStopIndex = gpColorStops.findIndex((i: IColorItem) => i.position === getRelativeOffset((e.target as HTMLElement), offsetX));
         if (activeStopIndex > -1) {
             setActive(activeStopIndex);
@@ -164,12 +175,14 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
 
     function onColorInputChange(e: Event) {
         changeColor((e.target as HTMLInputElement).value);
+        trigger(EVENTS.CHANGE);
         render();
     }
 
     function onColorStopRemoved() {
         removeColorStop();
         setActive(0);
+        trigger(EVENTS.CHANGE);
     }
 
     function createPopup() {
@@ -303,6 +316,7 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
             getRelativeOffset($stopsContainer, x),
             draggedStop.dataset.index ? parseInt(draggedStop.dataset.index) : 0
         );
+        trigger(EVENTS.CHANGE);
         renderGradients();
         renderLocationInput();
     }
@@ -318,16 +332,19 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
         document.body.addEventListener('mouseup', () => {
             isBeingDragged = false;
         }, true);
+        trigger(EVENTS.DRAG_START);
     }
 
     function stopMoveColorStop() {
         isBeingDragged = false;
+        trigger(EVENTS.DRAG_END);
     }
 
     // endregion
 
     function setActiveColor(color: string) {
         changeColor(color);
+        trigger(EVENTS.CHANGE);
         render();
     }
 
@@ -340,7 +357,7 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
     }
 
     return {
-        onChange: onChange,
+        on: on,
         setActiveColor: setActiveColor,
         getInputElement: getInputElement,
         getActiveColor: getActiveColor,

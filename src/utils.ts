@@ -8,7 +8,6 @@ export function dragElement(domElement: HTMLElement, dragZoneElemSelector: strin
     }
 
     function dragMouseDown(e: Event) {
-        e = e || window.event;
         e.preventDefault();
         // get the mouse cursor position at startup:
         pos3 = (e as MouseEvent).clientX;
@@ -19,7 +18,6 @@ export function dragElement(domElement: HTMLElement, dragZoneElemSelector: strin
     }
 
     function elementDrag(e: Event) {
-        e = e || window.event;
         e.preventDefault();
         // calculate the new cursor position:
         pos1 = pos3 - (e as MouseEvent).clientX;
@@ -95,7 +93,7 @@ export function makeResizableDiv(domElement: HTMLElement, onResizeCb?: () => voi
 
     function resizeLeft(e: MouseEvent) {
         domElement.style.left = e.pageX + 'px';
-        domElement.style.width = initWidth + (initLeft - e.pageX)  + 'px';
+        domElement.style.width = initWidth + (initLeft - e.pageX) + 'px';
         if (onResizeCb) {
             onResizeCb();
         }
@@ -112,3 +110,28 @@ export function centerElem(domElem: HTMLElement) {
     domElem.style.left = (window.innerWidth / 2) - (rect.width / 2) + 'px';
     domElem.style.top = (window.innerHeight / 2) - (rect.height / 2) + 'px';
 }
+
+export function getGradientString(colors: { color: string, position: number }[]): string {
+    let value;
+    if (colors.length === 1) {
+        value = `${colors[0].color}`
+    } else {
+        value = `linear-gradient(to right, `;
+        for (let i = 0; i < colors.length; i++) {
+            value += `${colors[i].color} ${colors[i].position}%${i === colors.length - 1 ? `` : `,`}`;
+        }
+        value += `)`;
+    }
+    return value;
+}
+
+
+export function getElementCssWidth(className: string): number {
+    const el = document.createElement('div');
+    el.className = className;
+    document.body.appendChild(el);
+    const css = el.getBoundingClientRect();
+    document.body.removeChild(el);
+    return css.width;
+}
+

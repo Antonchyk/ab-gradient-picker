@@ -1,4 +1,12 @@
-import {centerElem, clearNode, dragElement, getAbsoluteOffset, getRelativeOffset, makeResizableDiv} from "./utils";
+import {
+    centerElem,
+    clearNode,
+    dragElement,
+    getAbsoluteOffset, getElementCssWidth,
+    getGradientString,
+    getRelativeOffset,
+    makeResizableDiv
+} from "./utils";
 import './styles/main.scss';
 
 export interface IColorItem {
@@ -45,26 +53,29 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
         gpConfig = Object.assign(DEFAULT_CONFIG, config);
     }
     // endregion
-    const observers: ((data: IColorItem[]) => void)[] = [];
     let isBeingDragged = false;
     let draggedStop: HTMLElement;
     let activeIndex = 0;
     const gpPrefix = 'ab-gp-';
-    const STOP_CENTER = getStopItemWidth(gpPrefix) / 2;
-
+    const STOP_CENTER = getElementCssWidth(`${gpPrefix}stop-item`) / 2;
     const gpColorStops = JSON.parse(JSON.stringify(gpConfig.initColors));
 
-    let $colorDivInput: HTMLDivElement | null = null;
-    let $colorInput: HTMLInputElement | null = null;
-    const $popup = createPopup(gpConfig.zIndex);
-    const $gradientScreen = $popup.querySelector(`.${gpPrefix}gradient-screen`);
-    const $stopsContainer = $popup.querySelector(`.${gpPrefix}stops-container`);
-    const $closeButton = $popup.querySelector(`.${gpPrefix}close`);
-    const $deleteStopButton = $popup.querySelector(`.${gpPrefix}delete-stop`);
-    const $positionInput = $popup.querySelector(`.${gpPrefix}location-input`);
-    const $colorInputContainer = $popup.querySelector(`.${gpPrefix}color-input-container`);
-    if ($colorInputContainer) {
-        createColorInput($colorInputContainer, gpConfig.isCustomColorPicker);
+    const $popup = createPopup();
+    $popup.style.zIndex = gpConfig.zIndex ? gpConfig.zIndex.toString() : '';
+
+    const $gradientScreen: HTMLElement | null = $popup.querySelector(`.${gpPrefix}gradient-screen`);
+    const $stopsContainer: HTMLElement | null = $popup.querySelector(`.${gpPrefix}stops-container`);
+    const $closeButton: HTMLElement | null = $popup.querySelector(`.${gpPrefix}close`);
+    const $deleteStopButton: HTMLElement | null = $popup.querySelector(`.${gpPrefix}delete-stop`);
+    const $positionInput: HTMLElement | null = $popup.querySelector(`.${gpPrefix}location-input`);
+    const $colorDivInput: HTMLElement | null = $popup.querySelector(`.${gpPrefix}color-div-input`);
+
+    if (!gpConfig.isCustomColorPicker) {
+        const $colorInput = document.createElement('input');
+        $colorInput.type = 'color';
+        $colorInput.className = `${gpPrefix}inner-color-input`;
+        $colorInput.addEventListener('change', onColorInputChange)
+        $colorDivInput?.appendChild($colorInput);
     }
 
     $closeButton?.addEventListener('click', close, false);
@@ -74,30 +85,11 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
     $stopsContainer?.addEventListener('mouseup', stopMoveColorStop, false);
     $deleteStopButton?.addEventListener('click', onColorStopRemoved);
     $positionInput?.addEventListener('change', onPositionChanged);
-    document.body.addEventListener('mouseup', () => {
-        isBeingDragged = false;
-    }, true);
     document.body.appendChild($popup);
     centerElem($popup);
     dragElement($popup, `.${gpPrefix}header`);
     makeResizableDiv($popup, renderStops);
     setActive(0);
-
-    function createColorInput(container: Element, isCustom: boolean = false) {
-        $colorDivInput = document.createElement('div');
-        $colorDivInput.className = `${gpPrefix}color-div-input`;
-
-        $colorInput = document.createElement('input');
-        $colorInput.type = 'color';
-        $colorInput.className = `${gpPrefix}color-input`;
-
-        if (isCustom) {
-            container.appendChild($colorDivInput as Node);
-        } else {
-            container.appendChild($colorInput);
-            $colorInput.addEventListener('change', onColorInputChange);
-        }
-    }
 
     // region model
     function addColorStop(position: number) {
@@ -137,6 +129,9 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
 
     // endregion
 
+    // region observers
+    const observers: ((data: IColorItem[]) => void)[] = [];
+
     function triggerChange() {
         observers.map(cb => cb(gpColorStops));
     }
@@ -144,6 +139,7 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
     function onChange(cb: (data: IColorItem[]) => void) {
         observers.push(cb);
     }
+    // endregion
 
     function setActive(index: number) {
         activeIndex = index;
@@ -176,7 +172,7 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
         setActive(0);
     }
 
-    function createPopup(zIndex?: number) {
+    function createPopup() {
         const template = `<div class="${gpPrefix}header">Gradient Picker</div>
                           <div class="${gpPrefix}wrapper">
                               <div class="${gpPrefix}gradient-screen"></div>
@@ -185,8 +181,7 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
                                 <span class="${gpPrefix}stops-title">Stops</span>
                                 <div class="${gpPrefix}input-item">
                                     <label>Color:</label>
-                                    <div class="${gpPrefix}color-input-container"></div>
-<!--                                    <input type="color" class="${gpPrefix}color-input">-->
+                                    <div class="${gpPrefix}color-div-input"></div>
                                 </div>
                                 <div class="${gpPrefix}input-item">
                                     <label for="location">Location:</label>
@@ -202,7 +197,6 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
         const p = document.createElement('div');
         p.className = `${gpPrefix}container`;
         p.innerHTML = template;
-        p.style.zIndex = zIndex ? zIndex.toString() : '';
         return p;
     }
 
@@ -214,17 +208,7 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
         if (!$gradientScreen) {
             return;
         }
-        let value;
-        if (gpColorStops.length === 1) {
-            value = `${gpColorStops[0].color}`
-        } else {
-            value = `linear-gradient(to right, `;
-            for (let i = 0; i < gpColorStops.length; i++) {
-                value += `${gpColorStops[i].color} ${gpColorStops[i].position}%${i === gpColorStops.length - 1 ? `` : `,`}`;
-            }
-            value += `)`;
-        }
-        ($gradientScreen as HTMLDivElement).style.background = value;
+        ($gradientScreen as HTMLDivElement).style.background = getGradientString(gpColorStops);
     }
 
     function renderStops() {
@@ -251,16 +235,12 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
     }
 
     function renderLocationInput() {
-        if (!$positionInput) {
-            return;
+        if ($positionInput) {
+            ($positionInput as HTMLInputElement).value = gpColorStops[activeIndex].position;
         }
-        ($positionInput as HTMLInputElement).value = gpColorStops[activeIndex].position;
     }
 
     function renderColorInput() {
-        if ($colorInput) {
-            ($colorInput as any as HTMLInputElement).value = gpColorStops[activeIndex].color;
-        }
         if ($colorDivInput) {
             ($colorDivInput as any as HTMLInputElement).style.background = gpColorStops[activeIndex].color;
         }
@@ -335,6 +315,9 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
             isBeingDragged = true;
         }
         stopsContainerRect = $stopsContainer.getBoundingClientRect();
+        document.body.addEventListener('mouseup', () => {
+            isBeingDragged = false;
+        }, true);
     }
 
     function stopMoveColorStop() {
@@ -343,22 +326,13 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
 
     // endregion
 
-    function getStopItemWidth(prefix: string) {
-        const el = document.createElement('div');
-        el.className = `${prefix}stop-item`;
-        document.body.appendChild(el);
-        const css = el.getBoundingClientRect();
-        document.body.removeChild(el);
-        return css.width;
-    }
-
     function setActiveColor(color: string) {
         changeColor(color);
         render();
     }
 
     function getInputElement() {
-        return $colorDivInput ? $colorDivInput : $colorInput;
+        return $colorDivInput;
     }
 
     function getActiveColor() {

@@ -116,7 +116,7 @@ $gp-pfx: 'ab-gp-' !default;
     background: #525253;
   }
 
-  &color-input, &color-div-input {
+  &color-div-input {
     background: none;
     padding: 0;
     height: 28px;
@@ -124,6 +124,15 @@ $gp-pfx: 'ab-gp-' !default;
     border-radius: 0;
     width: 50px;
     position: relative;
+  }
+
+  &inner-color-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    top: 0;
+    left: 0;
   }
 
   &input-item {

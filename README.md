@@ -47,7 +47,7 @@ Install `npm i ab-gradient-picker`
 
 ## Add custom color picker
 
-Grapick is color picker independent and uses the browser's native one, by default, just to make it more accessible, but you can easily switch it with one of your choices (recommended as not all browsers support properly `input[type=color]`).
+ab-gradient-picker color picker is independent and uses the browser's native one by default, just to make it more accessible, but you can easily switch it with one of your choices (recommended as not all browsers support properly `input[type=color]`).
 
 In the example below we use [a-color-picker](https://narsenico.github.io/a-color-picker/) just as the proof of concept
 

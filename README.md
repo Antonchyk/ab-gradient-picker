@@ -38,9 +38,9 @@ Install `npm i ab-gradient-picker`
 
 # Configurations
 
-* `initColor` - array of colors and positions
-* `zIndex` - zIndex of popup(default: 999)
-* `isCustomColorPicker` - if custom color picker will be used, by default native browser one is used 
+* `initColor` - array of colors and positions (default: [])
+* `zIndex` - zIndex of popup (default: 999)
+* `isCustomColorPicker` - if custom color picker is to be used; by default native browser one is used (default: false)
 
 
 
@@ -54,7 +54,6 @@ In the example below we use [a-color-picker](https://narsenico.github.io/a-color
 ```ts
 import {createGradientPicker, IGradientPickerConfig} from 'ab-gradient-picker';
 import * as AColorPicker from 'a-color-picker';
-import {ACPController} from "a-color-picker";
 
 const config: IGradientPickerConfig = {
     initColors: [
@@ -78,7 +77,7 @@ gp.on('drag:end', v => console.log('drag:end', v));
 const colorInput = gp.getInputElement();
 colorInput.addEventListener('click', (e) => {
     const picker = AColorPicker.createPicker(colorInput, {color: gp.getActiveColor()});
-    picker.on('change', (p: ACPController, color) => {
+    picker.on('change', (p: AColorPicker.ACPController, color) => {
         gp.setActiveColor(color);
     });
     picker.element.addEventListener('click', e => e.stopPropagation());
@@ -99,18 +98,19 @@ colorInput.addEventListener('click', (e) => {
 
 Available events
 
-* `change` - Gradient is changed
-* `drag:start` - Started dragging the handler
-* `drag:end` - Stopped dragging the handler
+* `change` - gradient is changed
+* `drag:start` - started dragging the handler
+* `drag:end` - stopped dragging the handler
 
 ## API
 
 Methods
 
-* `setActiveColor(color: string)` - Change active color
+* `setActiveColor(color: string)` - change active color
 * `getInputElement():HTMLElement | null` - get color input element to override its behaviour. If isCustomColorPicker set to true there is just div with background color. 
-* `setActiveColor(color: string)` - set color for active color stop
-
+* `getActiveColor():string` - get color of active stop
+* `show()` - show picker
+* `hide()` - hide picker
 ## License
 
 MIT

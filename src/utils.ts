@@ -25,8 +25,8 @@ export function dragElement(domElement: HTMLElement, dragZoneElemSelector: strin
         pos3 = (e as MouseEvent).clientX;
         pos4 = (e as MouseEvent).clientY;
         // set the element's new position:
-        domElement.style.top = (domElement.offsetTop - pos2) + "px";
-        domElement.style.left = (domElement.offsetLeft - pos1) + "px";
+        domElement.style.top = (domElement.offsetTop - pos2) + 'px';
+        domElement.style.left = (domElement.offsetLeft - pos1) + 'px';
     }
 
     function closeDragElement() {
@@ -34,6 +34,54 @@ export function dragElement(domElement: HTMLElement, dragZoneElemSelector: strin
         document.onmouseup = null;
         document.onmousemove = null;
     }
+}
+
+export function dragElemInside(
+    elem: HTMLElement,
+    parentElem: HTMLElement,
+    onDragStart?: () => void,
+    onBeingDragged?: (position: number) => void,
+    onDragEnd?: () => void,
+) {
+    let absolutePosX: number;
+    let parentContainerRect: DOMRect;
+    let elemCenter: number;
+    elem.addEventListener('mousedown', (e) => {
+        // e.stopPropagation();
+        e.preventDefault();
+        absolutePosX = e.clientX;
+        parentContainerRect = parentElem.getBoundingClientRect();
+        elemCenter = elem.getBoundingClientRect().width / 2;
+        window.addEventListener('mouseup', stopDrag);
+        window.addEventListener('mousemove', dragElem);
+        if (onDragStart) {
+            onDragStart();
+        }
+    });
+
+    function dragElem(e: MouseEvent) {
+        parentContainerRect = parentElem.getBoundingClientRect();
+        const x = (e as MouseEvent).clientX - parentContainerRect.left;
+        if (parentContainerRect.width <= x) {
+            return;
+        }
+        if (x < 0) {
+            return;
+        }
+        elem.style.transform = `translate3d(${x - elemCenter}px, 0, 0)`;
+        if (onBeingDragged) {
+            onBeingDragged(x);
+        }
+    }
+
+    function stopDrag() {
+        window.removeEventListener('mousemove', dragElem);
+        window.removeEventListener('mouseup', stopDrag);
+        if (onDragEnd) {
+            onDragEnd();
+        }
+    }
+
 }
 
 export function getAbsoluteOffset(domElem: Element, relativeOffset: number) {
@@ -49,22 +97,26 @@ export function clearNode(node: Element) {
 }
 
 export function makeResizableDiv(domElement: HTMLElement, onResizeCb?: () => void) {
-    const resizerElemRight = document.createElement('div');
-    resizerElemRight.style.width = '2px';
-    resizerElemRight.style.height = '100%';
-    resizerElemRight.style.position = 'absolute';
-    resizerElemRight.style.top = '0';
-    resizerElemRight.style.right = '0';
-    resizerElemRight.style.cursor = 'ew-resize';
+    const style = {
+        'width': '2px',
+        'height': '100%',
+        'position': 'absolute',
+        'top': '0px',
+        'right': '0px',
+        'cursor': 'ew-resize',
+    }
+    const resizerElemRight = createElement('div', style);
     domElement.appendChild(resizerElemRight);
 
-    const resizerElemLeft = document.createElement('div');
-    resizerElemLeft.style.width = '2px';
-    resizerElemLeft.style.height = '100%';
-    resizerElemLeft.style.position = 'absolute';
-    resizerElemLeft.style.top = '0';
-    resizerElemLeft.style.left = '0';
-    resizerElemLeft.style.cursor = 'ew-resize';
+    const styleLeft = {
+        'width': '2px',
+        'height': '100%',
+        'position': 'absolute',
+        'top': '0px',
+        'left': '0px',
+        'cursor': 'ew-resize',
+    }
+    const resizerElemLeft = createElement('div', styleLeft);
     domElement.appendChild(resizerElemLeft);
 
     let initWidth = 0;
@@ -125,7 +177,6 @@ export function getGradientString(colors: { color: string, position: number }[])
     return value;
 }
 
-
 export function getElementCssWidth(className: string): number {
     const el = document.createElement('div');
     el.className = className;
@@ -133,5 +184,19 @@ export function getElementCssWidth(className: string): number {
     const css = el.getBoundingClientRect();
     document.body.removeChild(el);
     return css.width;
+}
+
+function createElement(type: string, styleObj: { [key: string]: string }): HTMLElement {
+    const el = document.createElement(type);
+    el.setAttribute('style', styleObjectToString(styleObj));
+    return el;
+}
+
+function styleObjectToString(styleObj: { [key: string]: string }): string {
+    let string = '';
+    Object.keys(styleObj).map((key: string) => {
+        string += `${key}:${styleObj[key]};`
+    });
+    return string;
 }
 

@@ -2,6 +2,8 @@
 
 Simple gradient picker, with no dependencies.
 
+![Screenshot](https://iili.io/3sxIs4.png)
+
 ## Download
 
 Install `npm i ab-gradient-picker`

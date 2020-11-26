@@ -168,9 +168,10 @@ export function getGradientString(colors: { color: string, position: number }[])
     if (colors.length === 1) {
         value = `${colors[0].color}`
     } else {
+        const sortedColors = [...colors].sort(sortByPosition);
         value = `linear-gradient(to right, `;
-        for (let i = 0; i < colors.length; i++) {
-            value += `${colors[i].color} ${colors[i].position}%${i === colors.length - 1 ? `` : `,`}`;
+        for (let i = 0; i < sortedColors.length; i++) {
+            value += `${sortedColors[i].color} ${sortedColors[i].position}%${i === sortedColors.length - 1 ? `` : `,`}`;
         }
         value += `)`;
     }
@@ -184,6 +185,10 @@ export function getElementCssWidth(className: string): number {
     const css = el.getBoundingClientRect();
     document.body.removeChild(el);
     return css.width;
+}
+
+export function sortByPosition(a: {position: number, color: string}, b: {position: number, color: string}) {
+    return a.position - b.position;
 }
 
 function createElement(type: string, styleObj: { [key: string]: string }): HTMLElement {

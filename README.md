@@ -40,7 +40,21 @@ Install `npm i ab-gradient-picker`
 
 # Configurations
 
-* `initColor` - array of colors and positions (default: [])
+* `initColors` - array of colors and positions (default: 
+```
+[
+    { 
+        color: '#ffffff',
+        position: 0,            
+    },
+    {
+        color: '#000000',
+        position: 100,
+    }
+]
+
+```
+)
 * `zIndex` - zIndex of popup (default: 999)
 * `isCustomColorPicker` - if custom color picker is to be used; by default native browser one is used (default: false)
 

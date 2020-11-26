@@ -5,7 +5,7 @@ import {
     getAbsoluteOffset, getElementCssWidth,
     getGradientString,
     getRelativeOffset,
-    makeResizableDiv
+    makeResizableDiv, sortByPosition
 } from "./utils";
 import './styles/main.scss';
 
@@ -142,7 +142,7 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
 
     function trigger(key: string) {
         if (observers.has(key)) {
-            observers.get(key)?.map(cb => cb(gpColorStops));
+            observers.get(key)?.map(cb => cb(gpColorStops.sort(sortByPosition)));
         }
     }
 

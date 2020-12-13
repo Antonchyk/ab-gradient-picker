@@ -105,7 +105,6 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
             color: '#ffffff',
             position: $stopsContainer ? getRelativeOffset($stopsContainer, position) : 0,
         });
-        sortColors();
     }
 
     function removeColorStop() {
@@ -113,11 +112,6 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
             return;
         }
         gpColorStops.splice(activeIndex, 1);
-        sortColors();
-    }
-
-    function sortColors() {
-        gpColorStops.sort((a: IColorItem, b: IColorItem) => a.position - b.position);
     }
 
     function changePosition(value: number, index: number) {
@@ -133,7 +127,6 @@ export function createGradientPicker(config?: IGradientPickerConfig): IGradientP
 
     function replaceColors(colors: IColorItem[]) {
         gpColorStops = colors;
-        sortColors();
     }
     // endregion
 
